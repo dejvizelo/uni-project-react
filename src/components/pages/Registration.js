@@ -5,6 +5,7 @@ import { useHistory, useParams } from "react-router-dom";
 const Registration = () => {
     let history = useHistory();
     const [courses, setCourses] = useState([]);
+    const [students, setStudents] = useState([]);
 
     const [registration, setReg] = useState({
         cId: "",
@@ -27,6 +28,7 @@ const Registration = () => {
 
     useEffect(() => {
         loadCourses();
+        loadStudents();
     }, []);
 
     const loadCourses = async () => {
@@ -38,6 +40,15 @@ const Registration = () => {
         setCourses(result.data.reverse());
     };
 
+    const loadStudents = async () => {
+        const result = await axios
+            .get("http://localhost:5000/students")
+            .catch((error) => {
+                console.log(error);
+            });
+        setStudents(result.data.reverse());
+    };
+
     return (
         <div className="container">
             <div className="w-75 mx-auto shadow p-5">
@@ -45,6 +56,7 @@ const Registration = () => {
                 <form onSubmit={e => onSubmit(e)}>
                     <div className="form-group">
                         <select
+                            className="form-control form-control-lg"
                             name="cId"
                             value={setReg.cId}
                             defaultValue=""
@@ -54,16 +66,17 @@ const Registration = () => {
                                 <option value={course.id}>{course.name}</option>
                             ))}
                         </select>
-                    </div>
-                    <div className="form-group">
-                        <input
-                            type="text"
+                        <select
                             className="form-control form-control-lg"
-                            placeholder="Enter the student ID"
                             name="sId"
                             value={setReg.sId}
-                            onChange={e => onInputChange(e)}
-                        />
+                            defaultValue=""
+                            onChange={e => onInputChange(e)}>
+                            <option hidden value="">Select a student</option>
+                            {students.map((student, index) => (
+                                <option value={student.id}>{student.name}</option>
+                            ))}
+                        </select>
                     </div>
                     <button className="btn btn-warning btn-block">Register</button>
                 </form>
